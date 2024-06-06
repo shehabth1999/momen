@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from accounts.models import BaseUser
+from django.utils.translation import gettext_lazy as _
 
 class LoginSerializer(serializers.ModelSerializer):
     username = serializers.CharField()
@@ -10,7 +11,7 @@ class LoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BaseUser
-        fields = ['id', 'username', 'email', 'token', 'password', 'is_superuser',]
+        fields = ['id', 'username', 'email', 'token', 'password', 'is_superuser','amount']
 
     def validate(self, attrs):
         username = attrs.get('username')
@@ -21,10 +22,10 @@ class LoginSerializer(serializers.ModelSerializer):
                                 username=username, password=password)
 
             if not user:
-                msg = 'Unable to log in with provided credentials.'
+                msg = _('Unable to log in with provided credentials.')
                 raise serializers.ValidationError(msg, code='authorization')
         else:
-            msg = 'Must include "username" and "password".'
+            msg = _('Must include "username" and "password".')
             raise serializers.ValidationError(msg, code='authorization')
 
         attrs['user'] = user
