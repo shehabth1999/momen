@@ -16,7 +16,7 @@ class CustomerPagination(PageNumberPagination):
     max_page_size = 50
 
 class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.filter(is_active=True).order_by('id')
+    queryset = Customer.objects.filter(is_active=True).order_by('amount').order_by('id')
     serializer_class = CustomerSerializer
     pagination_class = CustomerPagination
 
@@ -36,14 +36,19 @@ class CustomerViewSet(viewsets.ModelViewSet):
 
 
 class CustomerSmallView(generics.ListAPIView):
-    queryset = Customer.objects.filter(is_active=True).order_by('id')
-    serializer_class = CustomerSmallSerializer
+    queryset = Customer.objects.filter(is_active=True)
+    serializer_class = CustomerSerializer
     filter_backends = [SearchFilter] 
     search_fields = ['id', 'name']
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.order_by('amount', 'id')
+        return queryset
+    
     def filter_queryset(self, queryset):
         day = self.request.query_params.get('day', None)
-        if day :
+        if day:
             queryset = queryset.filter(collect_day=day)
         return queryset
     
@@ -54,8 +59,6 @@ class CustomerSmallView(generics.ListAPIView):
             total_amount = self.filter_queryset(self.get_queryset()).aggregate(Sum('amount'))['amount__sum'] or 0
             response.data['total_amount'] = total_amount
         return response
-
-
 
 class RecordViewSet(viewsets.ModelViewSet):
     serializer_class = RecordSerializer
