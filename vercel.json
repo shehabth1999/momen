@@ -6,14 +6,14 @@
         "use": "@vercel/python",
         "config": {
           "maxLambdaSize": "50mb",
-          "runtime": "python3.9"
+          "runtime": "python3.12"
         }
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "project_name/wsgi.py"
+        "dest": "core/wsgi.py"
       }
     ]
   }
