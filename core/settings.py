@@ -19,7 +19,10 @@ SECRET_KEY = 'django-insecure-t$tb8cd$5*!p#lxn%1uultf&h6gy29=4)4dy&ywa@ug50v$4+3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", ".vercel.app", ".now.sh", 'localhost']
+ALLOWED_HOSTS = ["127.0.0.1", ".vercel.app", ".now.sh", 'localhost', "*"]
+
+REACT_TEMPLATE = os.path.join(BASE_DIR, 'reactapp/build')
+REACT_STATIC = os.path.join(BASE_DIR, 'reactapp/build/static')
 
 # Application definition
 
@@ -169,3 +172,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Static files settings
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+STATICFILES_DIRS = [
+    REACT_STATIC,
+]
