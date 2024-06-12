@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from customers.models import Customer, Record, Address, MainValue
+from customers.models import Customer, Record, Address, MainValue, Notes
 from django.utils.translation import gettext_lazy as _
 from accounts.models import BaseUser
 
@@ -86,3 +86,20 @@ class RecordSerializer(serializers.ModelSerializer):
 
 
 
+class NotesSerializer(serializers.ModelSerializer):
+    customer = CustomeMinimumSerializer(read_only=True)
+    customer_id = serializers.IntegerField(write_only=True)
+    
+    class Meta:
+        model = Notes
+        fields = '__all__'
+
+    def create(self, validated_data):
+        customer_id = validated_data.pop('customer_id')
+        try:
+            customer = Customer.objects.get(id = customer_id)
+            validated_data['customer'] = customer
+        except Customer.DoesNotExist:
+            serializers.ValidationError(_('Customer does not exist'))
+
+        return Notes.objects.create(**validated_data)

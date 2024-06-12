@@ -42,3 +42,18 @@ class Customer(models.Model):
 
     def __str__(self):
         return f'{self.name} | {self.address}'
+
+
+class Notes(models.Model):
+    NOTE_TYPE = (
+        (1 , 'ممتنع'),
+        (2 , 'صيانه'),
+    )
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT, related_name="notes")
+    note_type = models.IntegerField(choices=NOTE_TYPE)
+    is_solved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return f'{self.customer}'
