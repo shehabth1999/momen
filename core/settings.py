@@ -21,8 +21,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", ".vercel.app", ".now.sh", 'localhost', "*"]
 
-REACT_TEMPLATE = os.path.join(BASE_DIR, 'reactapp/build')
-REACT_STATIC = os.path.join(BASE_DIR, 'reactapp/build/static')
+# REACT_TEMPLATE = os.path.join(BASE_DIR, 'build')
+# REACT_STATIC = os.path.join(BASE_DIR, 'build/static')
 
 # Application definition
 
@@ -48,16 +48,17 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',  # Enhances security
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Static file serving in production
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Remove or comment out
+    'django.middleware.common.CommonMiddleware',  # Common operations middleware
+    'corsheaders.middleware.CorsMiddleware',  # CORS handling
+    'django.middleware.csrf.CsrfViewMiddleware',  # CSRF protection
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Authentication
+    'django.contrib.messages.middleware.MessageMiddleware',  # Messages framework
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',  # X-Frame-Options header
 ]
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins (for development)
 
 ROOT_URLCONF = 'core.urls'
 
@@ -65,6 +66,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
+        # 'DIRS': [REACT_TEMPLATE],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -158,10 +160,11 @@ REST_FRAMEWORK = {
 
 # allaw cors
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
 ]
-
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -174,6 +177,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
-STATICFILES_DIRS = [
-    REACT_STATIC,
-]
+# STATICFILES_DIRS = [
+#     REACT_STATIC,
+# ]
