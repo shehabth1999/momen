@@ -3,7 +3,7 @@ from django.core import validators
 from accounts.models import BaseUser
 
 class Address(models.Model):
-    area = models.CharField(max_length=50)
+    area = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.area
@@ -17,7 +17,7 @@ class MainValue(models.Model):
 
 
 class Record(models.Model):
-    customer = models.ForeignKey('Customer', on_delete=models.PROTECT, related_name="records", null=True, blank=True)
+    customer = models.ForeignKey('Customer', on_delete=models.CASCADE, related_name="records", null=True, blank=True)
     collector = models.ForeignKey(BaseUser, on_delete=models.PROTECT, related_name="collector")
     amount = models.IntegerField(default=0)
     is_refund = models.BooleanField(default=False)
@@ -29,7 +29,7 @@ class Record(models.Model):
 
 class Customer(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    address = models.ForeignKey(Address, on_delete=models.PROTECT)  
+    address = models.ForeignKey(Address, on_delete=models.CASCADE)  
     amount = models.PositiveIntegerField(default=0)
     collect_day = models.PositiveSmallIntegerField(null=True, validators=[
         validators.MinValueValidator(1),

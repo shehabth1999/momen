@@ -146,3 +146,99 @@ class NotesViewSet(viewsets.ModelViewSet):
         if is_solved :
             queryset = queryset.filter(is_solved=is_solved)
         return queryset.order_by('-id')
+
+# # Seed data
+import random
+
+arabic_names = [
+    "طارق",
+    "سلمى",
+    "محمود",
+    "جوان",
+    "مرام",
+    "عبداللطيف",
+    "هاجر",
+    "محمد",
+    "رحمة",
+    "سعيد",
+    "حنان",
+    "إيمان",
+    "سليمان",
+    "دانا",
+    "عبدالمجيد",
+    "فرح",
+    "رامي",
+    "سمية",
+    "عبدالوهاب",
+    "زينة",
+    "عبدالحميد",
+    "ندى",
+    "خلود",
+    "محمد",
+    "ريان",
+    "رباب",
+    "أحلام",
+    "عبدالقادر",
+    "شهد",
+    "سامر",
+    "داليا",
+    "فادي",
+    "جميلة",
+    "عبدالله",
+    "ميس",
+    "حسام",
+    "سهى",
+    "علياء",
+    "ياسر",
+    "لبنى",
+    "عماد",
+    "رغد",
+    "مجد",
+    "سارة",
+    "يزن",
+    "نورهان",
+    "محمد",
+    "شيماء",
+    "ناصر",
+    "مريم",
+    "عبدالرؤوف",
+    "مريانا",
+    "عبدالحليم",
+    "مي",
+    "محمد",
+    "سناء",
+    "جمال",
+    "رنيم",
+    "عبدالرزاق",
+    "داليا",
+    "سمير",
+    "نوران",
+    "حازم",
+    "آية",
+    "عبدالكريم",
+    "ملك",
+    "أنس",
+    "ريما",
+    "عبدالغني",
+    "ليلى"
+]
+addresses = [
+    20,
+    21,
+    22,
+]
+from django.shortcuts import HttpResponse
+
+def create_names(request):
+    for n in arabic_names:
+        address = random.choice(addresses)
+        collect_day = random.randint(1, 28)
+        try:
+            Customer.objects.create(
+                name=n,
+                address_id=address,
+                collect_day=collect_day,
+            )
+        except:
+            pass
+    return HttpResponse("done")    
