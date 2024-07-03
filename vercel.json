@@ -6,15 +6,11 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "50mb",
-        "runtime": "python3.8"
+        "runtime": "python3.12",
+        "maxDuration": 60
       }
     }
   ],
-  "functions": {
-    "core/wsgi.py": {
-      "maxDuration": 30
-    }
-  },
   "routes": [
     {
       "src": "/api/(.*)",
