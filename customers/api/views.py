@@ -4,7 +4,7 @@ from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, generics
 from customers.api.serializers import CustomerSerializer, CustomerSmallSerializer, RecordSerializer, NotesSerializer
-from customers.models import Customer, Record, Notes
+from customers.models import Customer, Record, Notes, Version
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import viewsets
 from django.utils import timezone
@@ -12,6 +12,9 @@ from django.db.models import Sum
 from rest_framework.decorators import action
 from django.utils.dateparse import parse_date
 
+def get_version(request):
+    version = Version.objects.all().first().version
+    return Response({'version': version}, status=status.HTTP_200_OK)
 
 class CustomerPagination(PageNumberPagination):
     page_size = 10
