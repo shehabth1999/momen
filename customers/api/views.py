@@ -20,7 +20,7 @@ class CustomerPagination(PageNumberPagination):
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.filter(is_active=True).order_by('amount').order_by('id')
     serializer_class = CustomerSerializer
-    pagination_class = CustomerPagination
+    # pagination_class = CustomerPagination
 
     # stop deleting
     def delete(self, request, pk):

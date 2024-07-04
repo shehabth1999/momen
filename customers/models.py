@@ -35,9 +35,9 @@ class Customer(models.Model):
         validators.MinValueValidator(1),
         validators.MaxValueValidator(28),
     ])
-    nick_name = models.CharField(max_length=100, null=True, blank=True)
-    phone = models.CharField(max_length=20, null=True, blank=True)
-    description = models.TextField(null= True, blank=True)
+    nick_name = models.CharField(max_length=100, default='', blank=True)
+    phone = models.CharField(max_length=20, default='', blank=True)
+    description = models.TextField(default='', blank=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -57,3 +57,14 @@ class Notes(models.Model):
 
     def __str__(self):
         return f'{self.customer}'
+    
+
+class Version(models.Model):
+    version = models.IntegerField(default=1)
+
+    def update_version(self):
+        self.version = self.version + 1
+        self.save()
+
+    def __str__(self):
+        return f'{self.version}'
