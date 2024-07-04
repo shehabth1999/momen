@@ -12,9 +12,10 @@ from django.db.models import Sum
 from rest_framework.decorators import action
 from django.utils.dateparse import parse_date
 
-def get_version(request):
-    version = Version.objects.all().first().version
-    return Response({'version': version}, status=status.HTTP_200_OK)
+class GetVersion(APIView):
+    def get(self, request):
+        version = Version.objects.all().first().version
+        return Response({'version': version}, status=status.HTTP_200_OK)
 
 class CustomerPagination(PageNumberPagination):
     page_size = 10
