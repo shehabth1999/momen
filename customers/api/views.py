@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, generics
-from customers.api.serializers import CustomerSerializer, CustomerSmallSerializer, RecordSerializer, NotesSerializer
-from customers.models import Customer, Record, Notes, Version
+from customers.api.serializers import CustomerSerializer, CustomerSmallSerializer, RecordSerializer, NotesSerializer, CustomerValueSerializer
+from customers.models import Customer, Record, Notes, Version, CustomerValue, MainValue
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import viewsets
 from django.utils import timezone
@@ -22,7 +22,7 @@ class CustomerPagination(PageNumberPagination):
     max_page_size = 50
 
 class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.filter(is_active=True).order_by('amount').order_by('id')
+    queryset = Customer.objects.filter(is_active=True).order_by('id')
     serializer_class = CustomerSerializer
     # pagination_class = CustomerPagination
 
@@ -50,7 +50,7 @@ class CustomerSmallView(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.order_by('amount', 'id')
+        queryset = queryset.order_by('id')
         return queryset
     
     def filter_queryset(self, queryset):
@@ -62,10 +62,6 @@ class CustomerSmallView(generics.ListAPIView):
     
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
-        day = request.query_params.get('day', None)
-        if day:
-            total_amount = self.filter_queryset(self.get_queryset()).aggregate(Sum('amount'))['amount__sum'] or 0
-            response.data['total_amount'] = total_amount
         return response
 
 class RecordViewSet(viewsets.ModelViewSet):
@@ -113,27 +109,27 @@ class RecordViewSet(viewsets.ModelViewSet):
         return Response({'count': queryset.count(), 'total_amount':total_amount, 'records': serializer.data, }, status=status.HTTP_200_OK)
 
 
-class Arrears(generics.ListAPIView):
-    day = timezone.now().day
-    queryset = Customer.objects.filter(is_active=True, collect_day__lt=day, amount__gt=0).order_by('-collect_day')
-    serializer_class = CustomerSmallSerializer
-    filter_backends = [SearchFilter] 
-    search_fields = ['id', 'name']
+# class Arrears(generics.ListAPIView):
+#     day = timezone.now().day
+#     queryset = Customer.objects.filter(is_active=True, collect_day__lt=day, amount__gt=0).order_by('-collect_day')
+#     serializer_class = CustomerSmallSerializer
+#     filter_backends = [SearchFilter] 
+#     search_fields = ['id', 'name']
 
 
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        day = self.request.query_params.get('day', None)
-        if day :
-            queryset = queryset.filter(collect_day=day)
-        return queryset
+#     def filter_queryset(self, queryset):
+#         queryset = super().filter_queryset(queryset)
+#         day = self.request.query_params.get('day', None)
+#         if day :
+#             queryset = queryset.filter(collect_day=day)
+#         return queryset
 
-    def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        # Calculate the sum of the amount values for the filtered queryset
-        total_amount = self.filter_queryset(self.get_queryset()).aggregate(Sum('amount'))['amount__sum'] or 0
-        response.data['total_amount'] = total_amount
-        return response
+#     def get(self, request, *args, **kwargs):
+#         response = super().get(request, *args, **kwargs)
+#         # Calculate the sum of the amount values for the filtered queryset
+#         total_amount = self.filter_queryset(self.get_queryset()).aggregate(Sum('amount'))['amount__sum'] or 0
+#         response.data['total_amount'] = total_amount
+#         return response
 
 
 class NotesViewSet(viewsets.ModelViewSet):
@@ -150,6 +146,24 @@ class NotesViewSet(viewsets.ModelViewSet):
         if is_solved :
             queryset = queryset.filter(is_solved=is_solved)
         return queryset.order_by('-id')
+
+
+class CustomerValueViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = CustomerValueSerializer
+    queryset = CustomerValue.objects.all().order_by('-id')
+
+
+def new_customer_month(request):
+    Customers = Customer.objects.all()
+    base_value = MainValue.objects.first().amount if MainValue.objects.first() else 0
+
+    for customer in Customers:
+        obj , created = CustomerValue.objects.get_or_create(customer=customer)
+        old_value = obj.amount
+        new_value = base_value + old_value
+        obj.amount = new_value
+        obj.save()
+    return HttpResponse('DONE', status=status.HTTP_200_OK)
 
 # # Seed data
 import random

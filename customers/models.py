@@ -30,7 +30,6 @@ class Record(models.Model):
 class Customer(models.Model):
     name = models.CharField(max_length=100, unique=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)  
-    amount = models.PositiveIntegerField(default=0)
     collect_day = models.PositiveSmallIntegerField(null=True, validators=[
         validators.MinValueValidator(1),
         validators.MaxValueValidator(28),
@@ -42,7 +41,14 @@ class Customer(models.Model):
 
     def __str__(self):
         return f'{self.name} | {self.address}'
+    
 
+class CustomerValue(models.Model):
+    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, related_name="customer_values")
+    amount = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.customer.name} | {self.amount}'
 
 class Notes(models.Model):
     NOTE_TYPE = (

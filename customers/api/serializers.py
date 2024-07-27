@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from customers.models import Customer, Record, Address, MainValue, Notes
+from customers.models import Customer, Record, Address, MainValue, Notes, CustomerValue
 from django.utils.translation import gettext_lazy as _
 from accounts.models import BaseUser
 
@@ -21,7 +21,7 @@ class CustomerSerializer(serializers.ModelSerializer):
         try:
             address = Address.objects.get(id = address_id)
         except Address.DoesNotExist:
-            serializers.ValidationError(_('Address does not exist'))
+            raise serializers.ValidationError(_('Address does not exist'))
 
         # Associate the address with the validated data
         validated_data['address'] = address
@@ -33,12 +33,12 @@ class CustomerSmallSerializer(serializers.ModelSerializer):
     address = serializers.StringRelatedField()
     class Meta:
         model = Customer
-        fields = ['id', 'name', 'address', 'amount', 'collect_day']
+        fields = ['id', 'name', 'address', 'collect_day']
 
 class CustomeMinimumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'address']
 
 
 
@@ -57,8 +57,9 @@ class RecordSerializer(serializers.ModelSerializer):
         try:
             customer = Customer.objects.get(id = customer_id)
             validated_data['customer'] = customer
+            customer_value , created = CustomerValue.objects.get_or_create(customer=customer)
         except Customer.DoesNotExist:
-            serializers.ValidationError(_('Customer does not exist'))
+            raise serializers.ValidationError(_('Customer does not exist'))
 
         # get collector from request.user
         collector = BaseUser.objects.get(id = self.context['request'].user.id)    
@@ -73,13 +74,12 @@ class RecordSerializer(serializers.ModelSerializer):
         else:
             validated_data['amount'] = main_value
 
-        new_val = customer.amount - validated_data['amount']
+        new_val = customer_value.amount- validated_data['amount']
 
         if new_val < 0:
             raise serializers.ValidationError(_('This Customer Already Paid'))
-        
-        customer.amount = new_val
-        customer.save()
+        customer_value.amount = new_val
+        customer_value.save()
 
         return Record.objects.create(**validated_data)    
     
@@ -100,6 +100,13 @@ class NotesSerializer(serializers.ModelSerializer):
             customer = Customer.objects.get(id = customer_id)
             validated_data['customer'] = customer
         except Customer.DoesNotExist:
-            serializers.ValidationError(_('Customer does not exist'))
+            raise serializers.ValidationError(_('Customer does not exist'))
 
         return Notes.objects.create(**validated_data)
+    
+
+
+class CustomerValueSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = CustomerValue
+        fields = ['customer', 'amount']
