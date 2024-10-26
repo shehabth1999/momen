@@ -1,6 +1,6 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
-from customers.api.views import CustomerViewSet, CustomerSmallView, RecordViewSet, NotesViewSet, CustomerValueViewSet, new_customer_month
+from customers.api.views import CustomerViewSet, CustomerSmallView, RecordViewSet, NotesViewSet, CustomerValueViewSet, new_customer_month, GetMainValue
 
 
 router = DefaultRouter()
@@ -13,4 +13,5 @@ urlpatterns = [
     path('', CustomerSmallView.as_view(), name='customers-small'),
     path('', include(router.urls)),
     path('new_month/', new_customer_month, name='new_month'),
+    path('get_main_value/', GetMainValue.as_view(), name='get_main_value'),
 ]

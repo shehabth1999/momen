@@ -36,9 +36,13 @@ class CustomerSmallSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'address', 'collect_day']
 
 class CustomeMinimumSerializer(serializers.ModelSerializer):
+    address = serializers.SerializerMethodField('get_address', read_only=True)
     class Meta:
         model = Customer
         fields = ['id', 'name', 'address']
+
+    def get_address(self, obj):
+        return obj.address.area    
 
 
 

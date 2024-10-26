@@ -153,6 +153,14 @@ class CustomerValueViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CustomerValue.objects.all().order_by('-id')
 
 
+class GetMainValue(APIView):
+    def get(self, request):
+        value = MainValue.objects.first()
+        if value:
+            return Response({'value': value.amount}, status=status.HTTP_200_OK)
+        return Response({'value': 0}, status=status.HTTP_200_OK) 
+
+
 def new_customer_month(request):
     Customers = Customer.objects.all()
     base_value = MainValue.objects.first().amount if MainValue.objects.first() else 0
@@ -163,6 +171,8 @@ def new_customer_month(request):
         new_value = base_value + old_value
         obj.amount = new_value
         obj.save()
+    # Record.objects.all().delete()
+    # Notes.objects.all().delete()
     return HttpResponse('DONE', status=status.HTTP_200_OK)
 
 # # Seed data
